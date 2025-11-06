@@ -2,43 +2,28 @@ name: React CI/CD Workflow
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./react-ci-cd-app-real   # 👈 Path to your React project inside Fullstack repo
-
     steps:
-      # Step 1: Checkout repository
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      # Step 4: Run tests
-      - name: Run tests
-        run: npm test -- --watchAll=false
-
-      # Step 5: Build project
       - name: Build project
         run: npm run build
 
-      # Step 6: Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./react-ci-cd-app-real/build   # 👈 Path to built files
+      - name: Run tests
+        run: npm test --if-present
